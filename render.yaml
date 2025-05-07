@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: csp-evaluator
+    env: python
+    buildCommand: ""
+    startCommand: "python CSP_evulator.py"
