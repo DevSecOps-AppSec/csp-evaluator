@@ -71,14 +71,20 @@ HTML_TEMPLATE = """
 
 def parse_csp(header: str):
     directives = defaultdict(list)
+    syntax_warnings = []
     for part in header.split(";"):
         if not part.strip():
             continue
         tokens = part.strip().split()
+        if not tokens:
+            continue
         directive = tokens[0].lower()
+        if directive.endswith(":"):
+            syntax_warnings.append(f"Directive <code>{escape_html(directive)}</code> uses a colon — should use space instead.")
+            directive = directive.rstrip(":")
         values = tokens[1:]
         directives[directive] = values
-    return directives
+    return directives, syntax_warnings
 
 def escape_html(text):
     return (text.replace("&", "&amp;")
@@ -88,9 +94,15 @@ def escape_html(text):
                 .replace("'", "&#x27;"))
 
 def evaluate_csp(header: str):
-    directives = parse_csp(header)
+    directives, syntax_warnings = parse_csp(header)
     html = ["<h2>Evaluation Results</h2>"]
     html.append("<pre><code>" + escape_html(header) + "</code></pre>")
+
+    if syntax_warnings:
+        html.append("<h3>🚫 CSP Syntax Issues:</h3><ul>")
+        for warn in syntax_warnings:
+            html.append(f"<li><span class='error'>⚠️ {warn}</span></li>")
+        html.append("</ul>")
 
     html.append("<h3>🔍 Missing Critical Directives:</h3><ul>")
     for directive, reason in CRITICAL_DIRECTIVES.items():
@@ -118,6 +130,14 @@ def evaluate_csp(header: str):
     for modern in MODERN_DIRECTIVES:
         if modern not in directives:
             html.append(f"<li><span class='suggest'>💡 Consider adding</span> <code>{modern}</code>.</li>")
+    html.append("</ul>")
+
+    html.append("<h3>🧹 Redundancy Check:</h3><ul>")
+    if "default-src" in directives:
+        default = set(directives["default-src"])
+        for directive, values in directives.items():
+            if directive != "default-src" and set(values) == default:
+                html.append(f"<li><span class='info'>ℹ️ {directive}</span> duplicates <code>default-src</code>.</li>")
     html.append("</ul>")
 
     html.append("<h3>📄 Parsed Directives:</h3><ul>")
