@@ -36,7 +36,7 @@ HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
+    <meta charset=\"UTF-8\">
     <title>CSP Evaluator</title>
     <style>
         body { font-family: sans-serif; padding: 40px; }
@@ -51,12 +51,20 @@ HTML_TEMPLATE = """
 </head>
 <body>
     <h1>🛡️ CSP Evaluator</h1>
-    <form method="POST">
-        <textarea name="csp_input" placeholder="Paste your CSP header here...">{{ csp_input }}</textarea><br><br>
-        <button type="submit">Evaluate</button>
+    <form method=\"POST\">
+        <textarea name=\"csp_input\" placeholder=\"Paste your CSP header here...\">{{ csp_input }}</textarea><br><br>
+        <button type=\"submit\">Evaluate</button>
     </form>
     <hr>
     {{ report|safe }}
+    <hr>
+    <h2>📘 Standards and References</h2>
+    <ul>
+      <li><a href=\"https://www.w3.org/TR/CSP3/\" target=\"_blank\">W3C CSP Level 3 Specification</a></li>
+      <li><a href=\"https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html\" target=\"_blank\">OWASP CSP Cheat Sheet</a></li>
+      <li><a href=\"https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP\" target=\"_blank\">MDN CSP Documentation</a></li>
+      <li><a href=\"https://csp-evaluator.withgoogle.com/\" target=\"_blank\">Google CSP Evaluator Tool</a></li>
+    </ul>
 </body>
 </html>
 """
@@ -129,4 +137,5 @@ def index():
     return render_template_string(HTML_TEMPLATE, csp_input=csp_input, report=report)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    import os
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
