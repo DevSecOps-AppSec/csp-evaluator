@@ -132,7 +132,7 @@ HTML_TEMPLATE = """
             <li><a href=\"https://csp-evaluator.withgoogle.com/\" target=\"_blank\">Google CSP Evaluator Tool</a></li>
         </ul>
     </div>
-    <footer>&copy; 2025 DevSecOps AppSec Team</footer>
+    <footer>&copy; 2025 Souradip Ghosh</footer>
 </div>
 </body>
 </html>
