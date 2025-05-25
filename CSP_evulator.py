@@ -1,6 +1,5 @@
 from flask import Flask, request, render_template_string
 from collections import defaultdict
-from datetime import datetime
 import os
 
 app = Flask(__name__)
@@ -34,37 +33,107 @@ MODERN_DIRECTIVES = [
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
-<html>
+<html lang=\"en\">
 <head>
     <meta charset=\"UTF-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
     <title>CSP Evaluator</title>
+    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap\" rel=\"stylesheet\">
     <style>
-        body { font-family: sans-serif; padding: 40px; }
-        textarea { width: 100%; height: 150px; }
-        code { background: #f4f4f4; padding: 2px 4px; border-radius: 3px; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+            margin: 0;
+            padding: 2rem;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 1rem;
+            font-size: 1rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.5rem;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 960px;
+            margin: auto;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
         .error { color: red; font-weight: bold; }
         .warn { color: orange; font-weight: bold; }
         .ok { color: green; font-weight: bold; }
         .suggest { color: #007acc; }
         .info { color: gray; }
+        footer {
+            text-align: center;
+            color: gray;
+            margin-top: 2rem;
+        }
+        ul.refs {
+            padding-left: 1.25rem;
+        }
+        ul.refs li {
+            margin-bottom: 0.5rem;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
+<div class=\"container\">
     <h1>🛡️ CSP Evaluator</h1>
-    <form method=\"POST\">
-        <textarea name=\"csp_input\" placeholder=\"Paste your CSP header here...\">{{ csp_input }}</textarea><br><br>
-        <button type=\"submit\">Evaluate</button>
-    </form>
-    <hr>
-    {{ report|safe }}
-    <hr>
-    <h2>📘 Standards and References</h2>
-    <ul>
-      <li><a href=\"https://www.w3.org/TR/CSP3/\" target=\"_blank\">W3C CSP Level 3 Specification</a></li>
-      <li><a href=\"https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html\" target=\"_blank\">OWASP CSP Cheat Sheet</a></li>
-      <li><a href=\"https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP\" target=\"_blank\">MDN CSP Documentation</a></li>
-      <li><a href=\"https://csp-evaluator.withgoogle.com/\" target=\"_blank\">Google CSP Evaluator Tool</a></li>
-    </ul>
+    <div class=\"card\">
+        <form method=\"POST\">
+            <textarea name=\"csp_input\" placeholder=\"Paste your CSP header here...\">{{ csp_input }}</textarea><br><br>
+            <button type=\"submit\">Evaluate</button>
+        </form>
+    </div>
+    <div class=\"card\">
+        {{ report|safe }}
+    </div>
+    <div class=\"card\">
+        <h2>📘 Standards and References</h2>
+        <ul class=\"refs\">
+            <li><a href=\"https://www.w3.org/TR/CSP3/\" target=\"_blank\">W3C CSP Level 3 Specification</a></li>
+            <li><a href=\"https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html\" target=\"_blank\">OWASP CSP Cheat Sheet</a></li>
+            <li><a href=\"https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP\" target=\"_blank\">MDN CSP Documentation</a></li>
+            <li><a href=\"https://csp-evaluator.withgoogle.com/\" target=\"_blank\">Google CSP Evaluator Tool</a></li>
+        </ul>
+    </div>
+    <footer>&copy; 2025 DevSecOps AppSec Team</footer>
+</div>
 </body>
 </html>
 """
@@ -157,5 +226,4 @@ def index():
     return render_template_string(HTML_TEMPLATE, csp_input=csp_input, report=report)
 
 if __name__ == '__main__':
-    import os
     app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
